@@ -1,0 +1,181 @@
+Paddle paddle;
+Paddle autoPaddle;
+Puck puck;
+int scoreRed;
+int scoreGreen;
+
+void setup() {
+  size(displayWidth, displayHeight);
+  paddle = new Paddle(width/2, height-100, color(0,180,0));
+  autoPaddle = new Paddle(width/2, 40, color(180,0,0));
+  puck = new Puck();
+  scoreRed = 0;
+  scoreGreen = 0;
+}
+
+void draw() {
+  background(0);
+  fill(200,100,0);
+  rect(0,height/2,width,30);
+  paddle.display();
+  autoPaddleUpdate();
+  autoPaddle.display();
+  puck.check();
+  puck.display();
+  fill(255);
+  textSize(32);
+  pushMatrix();
+  translate(width-40, height-100);
+  rotate(HALF_PI);
+  text(scoreGreen, 0,0);
+  popMatrix(); 
+  textSize(32);
+  pushMatrix();
+  translate(width-40, 100);
+  rotate(HALF_PI);
+  text(scoreRed, 0,0);
+  popMatrix(); 
+  pushMatrix();
+  translate(width-40, height/2-70);
+  rotate(HALF_PI);
+  text("Exit", 0, 0);
+  popMatrix(); 
+  pushMatrix();
+  translate(width-40, height/2 + 50);
+  rotate(HALF_PI);
+  text("Pause", 0, 0);
+  popMatrix(); 
+}
+
+void mouseDragged() {
+  if (mouseY>=height/1.5)
+  paddle.x = mouseX-100;
+}
+
+void mousePressed() {
+if (mouseY<height/2 && mouseY>height/2-70 && mouseX>width-50)
+  exit();
+else if (mouseY>height/2 && mouseY<height/2+160 && mouseX>width-50)
+  if (looping) {
+    fill(180,0,0);
+    pushMatrix();
+    translate(width-40, height/2 + 50);
+    rotate(HALF_PI);
+    text("Pause", 0, 0);
+    popMatrix(); 
+    noLoop();
+  }
+  else
+    loop();
+}
+
+
+void autoPaddleUpdate() {
+  if (puck.x<autoPaddle.x)
+    autoPaddle.x -= 17;
+  if (puck.x>autoPaddle.x+200)
+    autoPaddle.x += 17;
+}
+
+
+
+
+
+
+
+
+
+
+
+class Paddle {
+  float x;
+  float y;
+  color hue;
+  
+  public Paddle(float x, float y, color hue) {
+    this.x = x;
+    this.y = y;
+    this.hue = hue;
+  }
+  
+  public void display() {
+    fill(hue);
+    rect(x, y, 200, 60);    
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+class Puck {
+  float x;
+  float y;
+  float velX;
+  float velY;
+  float flipCoin;
+
+  
+  public Puck() {
+    velY = 23;
+    flipCoin = random(0,1);
+    if (flipCoin>0.5)
+      velX = 7;
+    else
+      velX = -7;
+      
+    x = random(50,width-50);
+    y = 200;
+  }
+  
+  void display() {
+    upadte();
+    fill(195, 236, 111);
+    ellipse(x, y, 69,69);
+  }
+  
+  void upadte() {
+    if (x<50 || x>width-50)
+      velX = -velX;
+    if ((y<100 && x>=autoPaddle.x && x<=autoPaddle.x+200 && y>autoPaddle.y+30) || 
+    (y>height-100 && x>=paddle.x && x<=paddle.x+200 && y<paddle.y+30)) {
+      velY = -velY;
+      velX += map(abs(mouseX-pmouseX), 0, width/4, 7, 20);
+      if ((mouseX-pmouseX)<0)
+        velX = -velX;
+    }
+    x += velX;
+    y += velY;
+  }
+  
+  void check() {
+    if (y<0 || y>height) {
+      if (y<0) scoreGreen++;
+      else scoreRed++;
+      delay(1000);
+      velY = 23;
+      flipCoin = random(0,1);
+      if (flipCoin>0.5)
+        velX = 7;
+      else
+        velX = -7;
+        
+      x = random(50,width-50);
+      y = 200;
+    }
+  }
+}
+
+
+
+
+
+
+
+
